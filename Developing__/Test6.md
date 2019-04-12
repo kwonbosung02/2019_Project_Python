@@ -41,7 +41,15 @@ HoughLines 함수의 사용 방법이다.
 + theta : 0 ~ 180 사이의 각도
 + threshold : 만나는 점의 기준, 숫자가 적으면 많은 선 검출, 정확도 떨어짐. 숫자 많으면 정확도 상승
 
+`cv2.HoughLinesP(image,rho,theta,minLineLength,MaxLineGap)`
 
+확률 허프 변환 함수의 사용방법이다. 선의 시작점, 끝점을 리턴해준다.
+
++ image : 위와 동일
++ rho : 위와 동일
++ theta : 위와 동일
++ minLineLength : 선의 최소길이 설정
++ MaxLineGap : 선과 선 사이의 최소 간격
 
 
 

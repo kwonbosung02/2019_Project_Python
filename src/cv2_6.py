@@ -53,7 +53,7 @@ check_Movie(movie)
 lower_yellow =  np.array([20,100,100])
 upper_yellow =  np.array([30,255,255])
 lower_white = np.array([0, 0, 212])
-upper_white = np.array([130, 255, 255])
+upper_white = np.array([130, 245, 255])
 
 
 
@@ -81,12 +81,20 @@ while(True):
     frame_x = frame.shape[1]
 
     canny = cv2.Canny(grayframe,70,140)
-
-    #get_edge1 = cv2.Canny(img_white_blur,cv2.COLOR_BG2GRAY)
-    #lines1 = cv2.HoughLines(get_edge1,np.pi/180,100)
-    '''
-    for i in xrange(len(lines1)):
-        for rho, theta in lines1[i]:
+    
+    get_edge1 = cv2.Canny(img_white_blur,70,140)
+    get_edge2 = cv2.Canny(img_white_blur2,70,140)
+    #lines1 = cv2.HoughLines(get_edge1,1,np.pi/180,200)
+    lines = cv2.HoughLines(get_edge1,1,np.pi/180,200)
+    """if lines is not None:
+        for line in lines[0]:
+            pt1 = (line[0], line[1])
+            pt2 = (line[2], line[3])
+            cv2.line(get_edge1, pt1, pt2, (0, 0, 255), 3)
+    """
+    """
+    for i in range(len(lines1)):
+        for rho,theta in  lines1[i]:
             a = np.cos(theta)
             b = np.sin(theta)
             x0 = a*rho
@@ -95,19 +103,30 @@ while(True):
             y1 = int(y0 + 1000*(a))
             x2 = int(x0 - 1000*(-b))
             y2 = int(y0 - 1000*(a))
-
-            cv2.line(img_white_blur,(x1,y1),(x2,y2),(0,0,255),2)
-'''
-    #cv2.imshow('see->',dst)
-    #cv2.imshow('frame',frame)
+            cv2.line(get_edge1,(x1,y1),(x2,y2),(0,0,255),2)
+    """
+    lines = cv2.HoughLinesP(get_edge1, 1, np.pi/180, 50, maxLineGap=130)
+    if lines is not None:
+        for line in lines:
+            x1, y1, x2, y2 = line[0]
+            cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 5)
+    lines2 = cv2.HoughLinesP(get_edge2, 1, np.pi/180, 50, maxLineGap=130)
+    if lines2 is not None:
+        for line in lines2:
+            x1, y1, x2, y2 = line[0]
+            cv2.line(dst, (x1, y1), (x2, y2), (0, 255, 0), 5)
+    cv2.imshow('see->',dst)
+    cv2.imshow('frame',frame)
     #cv2.imshow('crop',crop_img)
     #cv2.setMouseCallback('frame',CallBackFunction)
     #cv2.imshow('yellow',img_yellow_blur)
-    
-    cv2.imshow('white',img_white_blur)
-    cv2.imshow('perspective_see',img_white_blur2)
 
+    #cv2.imshow('white',img_white_blur)
+    #cv2.imshow('perspective_see',img_white_blur2)
 
+    #cv2.imshow('canny_blur',get_edge1)
+    #cv2.imshow('canny_blur_perspective',get_edge2)
+    cv2.imshow('hough1',get_edge1)
     if cv2.waitKey(10) & 0xff == ord('q'):
         break
 
