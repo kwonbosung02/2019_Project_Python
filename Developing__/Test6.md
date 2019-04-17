@@ -51,9 +51,32 @@ HoughLines 함수의 사용 방법이다.
 + minLineLength : 선의 최소길이 설정
 + MaxLineGap : 선과 선 사이의 최소 간격
 
+```python
+    lines = cv2.HoughLinesP(get_edge1, 1, np.pi/180, 50, maxLineGap=100)
+    if lines is not None:
+        for line in lines:
+            x1, y1, x2, y2 = line[0]
+            cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 5)
+    lines2 = cv2.HoughLinesP(get_edge2, 1, np.pi/180, 50, maxLineGap=170)
+    if lines2 is not None:
+        for line in lines2:
+            x1, y1, x2, y2 = line[0]
+            cv2.line(dst, (x1, y1), (x2, y2), (0, 255, 0), 5)
+```
 
+분석에서 사용한 코드
 
+변형된 이미지 상태
 
+![](../img/hough1.jpeg)
+
+Perspective_See
+
+***
+
+![](../img/hough2.jpeg)
+
+HoughLinesp -> frame
 
 
 
