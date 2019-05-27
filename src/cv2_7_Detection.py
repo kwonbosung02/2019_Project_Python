@@ -40,11 +40,15 @@ def location_vertices_mask(img,vertices):
     mask_img = cv2.bitwise_and(img,mask)
     return mask_img
 
-
-def give_cropimg(frame):
+def location_get_mask(frame):
     frame_y = frame.shape[0]
     frame_x = frame.shape[1]
-    location_vertices = [(0, frame_y-50),(frame_x / 2, frame_y / 2 ),(frame_x, frame_y-50),]
+    location_vertices = [(0, frame_y-20),(frame_x / 2, frame_y / 2 ),(frame_x, frame_y-20),]
+    return location_vertices
+
+def give_cropimg(frame):
+    
+    location_vertices = location_get_mask(frame)
     return location_vertices_mask(frame,np.array([location_vertices],np.int32))
 
 
@@ -76,114 +80,134 @@ lower_white = np.array([0, 0, 212])
 upper_white = np.array([130, 245, 255])
 
 
+if __name__ == "__main__":
 
-while(True):
+    while(True):
 
-    ret, frame = movie.read()
-    crop_img = give_cropimg(frame)
+        ret, frame = movie.read()
+        #frame = cv2.resize(frame, dsize=(960,480),interpolation= cv2.INTER_AREA)
 
-    hsv = cv2.cvtColor(crop_img,cv2.COLOR_BGR2HSV)
-    Get = cv2.getPerspectiveTransform(point1, point2)
+        crop_img = give_cropimg(frame)
 
-    dst = cv2.warpPerspective(frame, Get, (1000,1000))
-    hsv2 = cv2.cvtColor(dst,cv2.COLOR_BGR2HSV)
-    grayframe = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
-    grayframe_crop = cv2.cvtColor(crop_img,cv2.COLOR_RGB2GRAY)
+        hsv = cv2.cvtColor(crop_img,cv2.COLOR_BGR2HSV)
+        Get = cv2.getPerspectiveTransform(point1, point2)
 
-    img_yellow_blur = function_Mask(hsv,lower_yellow,upper_yellow)
+        dst = cv2.warpPerspective(frame, Get, (1000,1000))
+        hsv2 = cv2.cvtColor(dst,cv2.COLOR_BGR2HSV)
+        grayframe = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
+        grayframe_crop = cv2.cvtColor(crop_img,cv2.COLOR_RGB2GRAY)
 
-    img_white_blur = function_Mask(hsv,lower_white,upper_white)
-    canny_blur = cv2.Canny(img_white_blur,100,200)
+        img_yellow_blur = function_Mask(hsv,lower_yellow,upper_yellow)
+
+        img_white_blur = function_Mask(hsv,lower_white,upper_white)
+        canny_blur = cv2.Canny(img_white_blur,100,200)
 
 
  
-    #canny_blur = give_cropimg(canny_blur)
+        #canny_blur = give_cropimg(canny_blur)
 
-    img_white_blur2 = function_Mask(hsv2,lower_white,upper_white)
+        img_white_blur2 = function_Mask(hsv2,lower_white,upper_white)
 
-    drawCircle_vertices(ret)
-    frame_y = frame.shape[0]
-    frame_x = frame.shape[1]
+        drawCircle_vertices(ret)
+        frame_y = frame.shape[0]
+        frame_x = frame.shape[1]
 
-    canny = cv2.Canny(grayframe_crop,100,200)
-    frame_y = frame.shape[0]
-    frame_x = frame.shape[1]
+        canny = cv2.Canny(grayframe_crop,100,200)
+        frame_y = frame.shape[0]
+        frame_x = frame.shape[1]
  
     
-    #lines1 = cv2.HoughLines(get_edge1,1,np.pi/180,200)
-    #lines = cv2.HoughLines(get_edge1,1,np.pi/180,200)
+        #lines1 = cv2.HoughLines(get_edge1,1,np.pi/180,200)
+        #lines = cv2.HoughLines(get_edge1,1,np.pi/180,200)
 
-    lines = cv2.HoughLinesP(
-    canny_blur,
-    rho=6,
-    theta=np.pi / 60,
-    threshold=160,
-    lines=np.array([]),
-    minLineLength=40,
-    maxLineGap=25
-    )
-    left_line_x = []
-    left_line_y = []
-    right_line_x = []
-    right_line_y = []
-    for line in lines:
-        for x1, y1, x2, y2 in line:
-            slope = (y2 - y1) / (x2 - x1) 
-            if math.fabs(slope) < 0.5:
-                continue
-            if slope <= 0:
-                left_line_x.extend([x1, x2])
-                left_line_y.extend([y1, y2])
-            else:
-                right_line_x.extend([x1, x2])
-                right_line_y.extend([y1, y2])
-    min_y = frame.shape[0] * (3 / 5)
-    max_y = frame.shape[0] 
-    poly_left = np.poly1d(np.polyfit(
-        left_line_y,
-        left_line_x,
-        deg=1
-    ))
-    left_x_start = int(poly_left(max_y))
-    left_x_end = int(poly_left(min_y))
-    poly_right = np.poly1d(np.polyfit(
-        right_line_y,
-        right_line_x,
-        deg=1
-    ))
-    right_x_start = int(poly_right(max_y))
-    right_x_end = int(poly_right(min_y))
-    line_image = draw_lines(
+        lines = cv2.HoughLinesP(
+        canny_blur,
+        rho=6,
+        theta=np.pi / 60,
+        threshold=160,
+        lines=np.array([]),
+        minLineLength=40,
+        maxLineGap=25
+        )
+        left_line_x = []
+        left_line_y = []
+        right_line_x = []
+        right_line_y = []
+        for line in lines:
+            for x1, y1, x2, y2 in line:
+                slope = (y2 - y1) / (x2 - x1) 
+                if math.fabs(slope) < 0.5:
+                    continue
+                if slope <= 0:
+                    left_line_x.extend([x1, x2])
+                    left_line_y.extend([y1, y2])
+                else:
+                    right_line_x.extend([x1, x2])
+                    right_line_y.extend([y1, y2])
+        min_y = frame.shape[0] * (3 / 5)
+        max_y = frame.shape[0] 
+        if left_line_x is not None and left_line_y is not None:
+            poly_left = np.poly1d(np.polyfit(
+            left_line_y,
+            left_line_x,
+            deg=1
+            ))
+            left_x_start = int(poly_left(max_y))
+            left_x_end = int(poly_left(min_y))
+        if left_line_x is None or left_line_y is None:
+            pass
+        
+        if right_line_x is not None and right_line_y is not None:
+
+            poly_right = np.poly1d(np.polyfit(
+            right_line_y,
+            right_line_x,
+            deg=1
+            ))
+            right_x_start = int(poly_right(max_y))
+            right_x_end = int(poly_right(min_y))
+        if right_line_x is None or right_line_y is None:
+            pass
+        
+        array_left_line = [int(left_x_start), int(max_y), int(left_x_end), min_y]
+        array_right_line =[int(right_x_start), int(max_y), int(right_x_end), min_y]
+        
+        if array_left_line.size == 0:
+            pass
+        if array_right_line == 0:
+            pass
+        #size??
+        line_image = draw_lines(
         frame,
         [[
-            [int(left_x_start), int(max_y), int(left_x_end), min_y],
-            [int(right_x_start), int(max_y), int(right_x_end), min_y],
+            array_left_line,
+            array_right_line,
         ]],
-        (0,255,0),
+        (0,255,255),
         3,
-    )
+        )
 
 
 
 
 
-    cv2.imshow('see->',dst)
-    cv2.imshow('frame',line_image)
-    cv2.imshow('crop',crop_img)
-    cv2.imshow('cropCanny',canny)
-    cv2.imshow('djk',canny_blur)
-    #cv2.imshow('crop',crop_img)
-    #cv2.setMouseCallback('frame',CallBackFunction)
-    #cv2.imshow('yellow',img_yellow_blur)
+        cv2.imshow('see->',dst)
+        cv2.imshow('frame',line_image)
+        #cv2.imshow('crop',crop_img)
+        #cv2.imshow('cropCanny',canny)
+        #cv2.imshow('djk',canny_blur)
+        #cv2.imshow('crop',crop_img)
+        #cv2.setMouseCallback('frame',CallBackFunction)
+        #cv2.imshow('yellow',img_yellow_blur)
 
-    #cv2.imshow('white',img_white_blur)
-    #cv2.imshow('perspective_see',img_white_blur2)
+        #cv2.imshow('white',img_white_blur)
+        #cv2.imshow('perspective_see',img_white_blur2)
 
-    #cv2.imshow('canny_blur',get_edge1)
-    #cv2.imshow('canny_blur_perspective',get_edge2)
-    #cv2.imshow('hough1',get_edge1)
-    if cv2.waitKey(10) & 0xff == ord('q'):
-        break
+        #cv2.imshow('canny_blur',get_edge1)
+        #cv2.imshow('canny_blur_perspective',get_edge2)
+        #cv2.imshow('hough1',get_edge1)
+        if cv2.waitKey(10) & 0xff == ord('q'):
+            break
 
-movie.release()
-cv2.destroyAllWindows()
+    movie.release()
+    cv2.destroyAllWindows()
