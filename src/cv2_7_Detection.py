@@ -1,6 +1,7 @@
 import numpy as np
 import cv2
 import math
+import numpy.core.numeric as NX
 
 FilePath = '../vid/road2.mp4'
 movie = cv2.VideoCapture(FilePath)
@@ -133,19 +134,20 @@ if __name__ == "__main__":
         left_line_y = []
         right_line_x = []
         right_line_y = []
-        for line in lines:
-            for x1, y1, x2, y2 in line:
-                slope = (y2 - y1) / (x2 - x1) 
-                if math.fabs(slope) < 0.5:
-                    continue
-                if slope <= 0:
-                    left_line_x.extend([x1, x2])
-                    left_line_y.extend([y1, y2])
-                else:
-                    right_line_x.extend([x1, x2])
-                    right_line_y.extend([y1, y2])
-        min_y = frame.shape[0] * (3 / 5)
-        max_y = frame.shape[0] 
+        if lines is not None:
+            for line in lines:
+                for x1, y1, x2, y2 in line:
+                    slope = (y2 - y1) / (x2 - x1) 
+                    if math.fabs(slope) < 0.5:
+                        continue
+                    if slope <= 0:
+                        left_line_x.extend([x1, x2])
+                        left_line_y.extend([y1, y2])
+                    else:
+                        right_line_x.extend([x1, x2])
+                        right_line_y.extend([y1, y2])
+        min_y = int(frame.shape[0] * (3 / 5))
+        max_y = int(frame.shape[0] * (8 / 9))
         if left_line_x is not None and left_line_y is not None:
             poly_left = np.poly1d(np.polyfit(
             left_line_y,
@@ -158,12 +160,15 @@ if __name__ == "__main__":
             pass
         
         if right_line_x is not None and right_line_y is not None:
-
-            poly_right = np.poly1d(np.polyfit(
-            right_line_y,
-            right_line_x,
-            deg=1
-            ))
+            try:
+                poly_right = np.poly1d(np.polyfit(
+                right_line_y,
+                right_line_x,
+                deg=1
+                ))  
+                print("Ok+deg")
+            except:
+                print("NO+deg")
             right_x_start = int(poly_right(max_y))
             right_x_end = int(poly_right(min_y))
         if right_line_x is None or right_line_y is None:
@@ -172,20 +177,25 @@ if __name__ == "__main__":
         array_left_line = [int(left_x_start), int(max_y), int(left_x_end), min_y]
         array_right_line =[int(right_x_start), int(max_y), int(right_x_end), min_y]
         
-        if array_left_line.size == 0:
-            pass
+        if array_left_line == 0:
+           pass
         if array_right_line == 0:
-            pass
+           pass
         #size??
-        line_image = draw_lines(
-        frame,
-        [[
-            array_left_line,
-            array_right_line,
-        ]],
-        (0,255,255),
-        3,
-        )
+        if (NX.asarray(array_left_line)+0.0).size != 0 and (NX.asarray(array_right_line)+0.0).size != 0:
+            line_image = draw_lines(
+            frame,
+            [[
+                array_left_line,
+                array_right_line,
+            ]],
+            (0,255,255),
+            3,
+            )
+            print("OK")
+        else:
+            print("NOn")
+            pass
 
 
 

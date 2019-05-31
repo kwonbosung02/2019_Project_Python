@@ -106,6 +106,43 @@ if x.size == 0:
 
 에러의 조건
 
+```python
+if is not None 을 이용해 오류 발생 조건을 확인하려 한다.
+```
+
+```python
+if left_line_x is not None and left_line_y is not None:
+      poly_left = np.poly1d(np.polyfit(
+      left_line_y,
+      left_line_x,
+      deg=1
+      ))
+      left_x_start = int(poly_left(max_y))
+      left_x_end = int(poly_left(min_y))
+ if left_line_x is None or left_line_y is None:
+      pass       
+```
+
+```python
+if (NX.asarray(array_left_line)+0.0).size != 0 and (NX.asarray(array_right_line)+0.0).size != 0:
+    line_image = draw_lines(
+    frame,
+    [[
+         array_left_line,
+         array_right_line,
+    ]],
+         (0,255,255),
+         3,
+         )
+    print("OK")
+    else:
+        print("NOn")
+        pass
+
+```
+
+여기에서는 에러가 발생하지 않는다.
+
 
 
 
