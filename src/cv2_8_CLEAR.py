@@ -149,11 +149,16 @@ if __name__ == "__main__":
         min_y = int(frame.shape[0] * (3 / 5))
         max_y = int(frame.shape[0] * (1))
         if left_line_x is not None and left_line_y is not None:
-            poly_left = np.poly1d(np.polyfit(
-            left_line_y,
-            left_line_x,
-            deg=1
-            ))
+            try:
+                poly_left = np.poly1d(np.polyfit(
+                left_line_y,
+                left_line_x,
+                deg=1
+                ))
+                prev_poly_left = poly_left
+            except:
+                poly_left = prev_poly_left
+  
             left_x_start = int(poly_left(max_y))
             left_x_end = int(poly_left(min_y))
         if left_line_x is None or left_line_y is None:
@@ -167,8 +172,10 @@ if __name__ == "__main__":
                 deg=1
                 ))  
                 print("Ok+deg")
+                prev_poly_right = poly_right
             except:
                 print("NO+deg")
+                poly_right = prev_poly_right
             right_x_start = int(poly_right(max_y))
             right_x_end = int(poly_right(min_y))
         if right_line_x is None or right_line_y is None:

@@ -141,9 +141,7 @@ if (NX.asarray(array_left_line)+0.0).size != 0 and (NX.asarray(array_right_line)
 
 ```
 
-여기에서는 에러가 발생하지 않는다.
-
-
+이러한 방법으로 if 조건이 맞을 때만 라인을 그리는 함수를 실행하고, 조건에 맞지 않으면 실행하지 않는 방법으로 문제를 해결하려 했지만, 해결되지 않았다. 
 
 
 
