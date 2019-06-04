@@ -99,8 +99,8 @@ if right_line_x is not None and right_line_y is not None:
    except:
         print("NO+deg")
         poly_right = prev_poly_right
-   right_x_start = int(poly_right(max_y))
-   right_x_end = int(poly_right(min_y))
+        right_x_start = int(poly_right(max_y))
+        right_x_end = int(poly_right(min_y))
 if right_line_x is None or right_line_y is None:
    pass
         
